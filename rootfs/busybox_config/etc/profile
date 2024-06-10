@@ -1,0 +1,6 @@
+# /etc/profile: system-wide .profile file for the Bourne shells
+
+PS1='[\u@\h \W]\# '
+HOSTNAME=`/bin/hostname`
+
+# no-op

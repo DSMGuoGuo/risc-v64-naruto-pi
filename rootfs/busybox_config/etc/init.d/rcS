@@ -1,0 +1,26 @@
+#! /bin/sh
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+LD_LIBRARY_PATH=/lib
+export PATH LD_LIBRARY_PATH
+
+mount -a
+/sbin/mdev -s
+mount -a
+
+# echo Naruto-Pi > /proc/sys/kernel/hostname
+
+/bin/hostname -F /etc/hostname
+
+dmesg -n 1
+chmod 666 /dev/null
+
+echo "---------------------------------------------------------------------------"
+echo "                 _   _                  _         ______ _                 "
+echo "                | \ | |                | |        | ___ (_)                "
+echo "                |  \| | __ _ _ __ _   _| |_ ___   | |_/ /_                 "
+echo "                |     |/ _  | '__| | | | __/ _ \  |  __/| |                "
+echo "                | |\  | (_| | |  | |_| | || (_) | | |   | |                "
+echo "                \_| \_/\__,_|_|   \__,_|\__\___/  \_|   |_|                "
+echo "                                                                           "
+echo "                 Welcome debugging on Naruto Pi board! "
+echo "---------------------------------------------------------------------------"

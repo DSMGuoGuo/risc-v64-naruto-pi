@@ -1,0 +1,6 @@
+QEMU RISC-V 'NARUTO-PI' BOARD
+M:	Jihong Zhang <1042476967@qq.com>
+S:	Maintained
+F:	board/emulation/qemu-naruto/
+F:	include/configs/qemu-naruto-pi.h
+F:	configs/qemu-naruto_pi_defconfig

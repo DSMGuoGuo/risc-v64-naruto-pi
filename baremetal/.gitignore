@@ -1,0 +1,9 @@
+# Object files
+*.o
+*.a
+*.dep
+*.elf
+*.map
+*.hex
+*.bin
+*.lst
