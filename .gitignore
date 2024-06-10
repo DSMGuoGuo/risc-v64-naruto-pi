@@ -1,0 +1,16 @@
+#VSCode
+*.code-workspace
+*vscode
+
+# Object files
+*.o
+*.a
+*.dep
+*.elf
+*.map
+*.hex
+*.bin
+*.lst
+
+#output image
+output/
