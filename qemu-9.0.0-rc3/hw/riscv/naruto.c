@@ -37,9 +37,10 @@ static const MemMapEntry naruto_soc_memmap[] = {
 	[NARUTO_SOC_SRAM]			= {0x00008000,	0x8000},
 	[NARUTO_SOC_CLINT]			= {0x02000000,	0x10000},
 	[NARUTO_SOC_PLIC]			= {0x0c000000,	0x4000000},
-	[NARUTO_SOC_UART0]			= {0x10000000,	0x100},
-	[NARUTO_SOC_UART1]			= {0x10001000,	0x100},
-	[NARUTO_SOC_UART2]			= {0x10002000,	0x100},
+	[NARUTO_SOC_UART0]			= {0x10000000,	0x1000},
+	[NARUTO_SOC_UART1]			= {0x10001000,	0x1000},
+	[NARUTO_SOC_UART2]			= {0x10002000,	0x1000},
+	[NARUTO_SOC_RTC]			= {0x10003000,	0x1000},
 	[NARUTO_SOC_VIRTIO0]		= {0x10100000,	0x1000},
 	[NARUTO_SOC_VIRTIO1]		= {0x10101000,	0x1000},
 	[NARUTO_SOC_VIRTIO2]		= {0x10102000,	0x1000},
@@ -282,6 +283,20 @@ static void naruto_fw_cfg_realize(DeviceState *dev)
 }
 
 /**
+ * @brief Naruto Pi RTC realize.
+ * 
+ * @param dev 
+ */
+static void naruto_rtc_realize(DeviceState *dev)
+{
+	NarutoSoCState *s = RISCV_NARUTO_SOC(dev);
+
+	sysbus_create_simple("goldfish_rtc",
+				naruto_soc_memmap[NARUTO_SOC_RTC].base,
+				qdev_get_gpio_in(DEVICE(s->plic), NARUTO_RTC_IRQ));
+}
+
+/**
  * @brief Create NARUTO_SOC_Device.
  * 
  * @param obj 
@@ -305,6 +320,7 @@ static void naruto_soc_realize(DeviceState *dev, Error **err)
 	naruto_uart_realize(dev);
 	naruto_virtio_realize(dev);
 	naruto_fw_cfg_realize(dev);
+	naruto_rtc_realize(dev);
 }
 
 static void naruto_soc_class_init(ObjectClass *klass, void *data)
