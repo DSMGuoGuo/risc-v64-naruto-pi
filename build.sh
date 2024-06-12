@@ -9,7 +9,7 @@ else
 fi
 PROJECT_DIR=$(pwd)
 
-ROOTFS_SEL=$2
+ROOTFS_SEL=${2:-busybox}
 
 COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output
 COMPILE_TOOLS_PATH=$COMPILE_PATH/bin
@@ -253,24 +253,24 @@ build_make_image()
 
 	sudo $UBOOT_SOURCE_PATH/tools/mkimage -A riscv -O linux -T script -C none -a 0 -e 0 -n "Distro Boot Script" -d $DTS_PATH/uboot_fs.cmd $OUTPUT_IMG_PATH/rootfs/bootfs/boot.scr
 
-#busybox
-	cp -r $OUTPUT_IMG_PATH/busybox/* $OUTPUT_IMG_PATH/rootfs/rootfs/
-	cp -r $BUSYBOX_CONFIG_PATH/* $OUTPUT_IMG_PATH/rootfs/rootfs/
-	mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/proc
-	mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/sys
-	mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/dev
-	mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/tmp
-	mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/lib
-	cd $OUTPUT_IMG_PATH/rootfs/rootfs/
-	ln -s ./lib ./lib64
-	cp -ra $COMPILE_LIB_PATH/lib/* $OUTPUT_IMG_PATH/rootfs/rootfs/lib/
-	cp -ra $COMPILE_LIB_PATH/usr/bin/* $OUTPUT_IMG_PATH/rootfs/rootfs/usr/bin/
-#busybox end
+	if [ "$ROOTFS_SEL" == "busybox" ]; then
+		#busybox
+		cp -r $OUTPUT_IMG_PATH/busybox/* $OUTPUT_IMG_PATH/rootfs/rootfs/
+		cp -r $BUSYBOX_CONFIG_PATH/* $OUTPUT_IMG_PATH/rootfs/rootfs/
+		mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/proc
+		mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/sys
+		mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/dev
+		mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/tmp
+		mkdir $OUTPUT_IMG_PATH/rootfs/rootfs/lib
+		cd $OUTPUT_IMG_PATH/rootfs/rootfs/
+		ln -s ./lib ./lib64
+		cp -ra $COMPILE_LIB_PATH/lib/* $OUTPUT_IMG_PATH/rootfs/rootfs/lib/
+		cp -ra $COMPILE_LIB_PATH/usr/bin/* $OUTPUT_IMG_PATH/rootfs/rootfs/usr/bin/
+	elif [ "$ROOTFS_SEL" == "ubuntu" ]; then
+		#ubuntu
+		sudo cp -ra $UBUNTU20_ROOTFS_PATH/rootfs/* $OUTPUT_IMG_PATH/rootfs/rootfs
+	fi
 
-#ubuntu
-	# sudo cp -ra $UBUNTU20_ROOTFS_PATH/rootfs/* $OUTPUT_IMG_PATH/rootfs/rootfs
-
-#ubuntu end
 	sudo $BUILD_ROOTFS_PATH/build.sh $OUTPUT_IMG_PATH/rootfs
 }
 
