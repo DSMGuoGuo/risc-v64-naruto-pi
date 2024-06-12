@@ -5,6 +5,47 @@
 
 # <span style="color:#e60000;"><span style="font-size:20px;">**2 编译Naruto Pi**</span></span>
 
+- 编译之前需要注意更改脚本GCC编译器地址
+- 文件路径：`build.sh`,将如下路径改成自己的编译器路径
+```sh
+COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output
+```
+- 编译器需要`RISCV64`的编译器，需要支持`Linux`.
+
+- 获取交叉编译工具链源码
+- 方法一： 官方`git`仓库，此方法比较慢，开了梯子也没用，用了公网`IP`也没用，建议用方法二
+
+```bash
+git clone https://github.com/riscv/riscv-gnu-toolchain --recursive
+```
+- 方法二：`Gitee`下载`main`仓库
+
+```bash
+git clone  https://gitee.com/mirrors/riscv-gnu-toolchain
+```
+- branch 分支，全拉下来
+
+```bash
+cd riscv-gnu-toolchain
+```
+
+```bash
+git clone https://gitee.com/mirrors/riscv-newlib
+git clone https://gitee.com/mirrors/riscv-binutils-gdb
+git clone https://gitee.com/mirrors/riscv-dejagnu
+git clone https://gitee.com/mirrors/riscv-glibc
+git clone https://gitee.com/mirrors/riscv-gcc
+```
+- 编译交叉编译工具链源码
+- 设置输出路径,这个输出路径就是我们上面要改的脚本的那个路径，记得一定要相同
+```bash
+./configure --prefix=/home/jihongz/workspace/03_toolchain/output
+```
+- 编译（如果出现权限问题加`sudo`即可）
+
+```bash
+make linux
+```
 
 ## <span style="color:#9933ff;"> 2.1 整体编译（busybox 文件系统）</span>
 `./build.sh all busybox`
