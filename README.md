@@ -60,9 +60,10 @@ make linux
 
 `./build.sh qemu`
 ## <span style="color:#9933ff;"> 2.4 编译lowinit</span>
+`lowinit` 是`bootrom`跳转出来的第一个程序，主要负责把`BL1~BL3`的程序从模拟的`pFLASH`中拷贝到`DDR`中。
+
 `./build.sh lowinit`
 
-`lowinit` 是`bootrom`跳转出来的第一个程序，主要负责把`BL1~BL3`的程序从模拟的`pFLASH`中拷贝到`DDR`中。
 ## <span style="color:#9933ff;"> 2.5 编译lowinit</span>
 `./build.sh lowinit`
 
@@ -72,8 +73,9 @@ make linux
 ## <span style="color:#9933ff;"> 2.7 编译oensbi</span>
 `./build.sh sbi`
 ## <span style="color:#9933ff;"> 2.8 编译uboot 和kernel 设备树</span>
-`./build.sh sbi`
 - `Naruto Pi`的`Kernel`和`U-boot`使用的是同一个设备树，统一管理。
+
+`./build.sh sbi`
 
 ## <span style="color:#9933ff;"> 2.9 编译uboot</span>
 `./build.sh uboot_defconfig`
@@ -90,6 +92,7 @@ make linux
 
 ## <span style="color:#9933ff;"> 2.12 压缩ubuntu</span>
 - 如果改过Ubuntu文件系统，想再次打包可以直接调用脚本：
+
 `./build.sh tar_ubuntu`
 
 ## <span style="color:#9933ff;"> 2.13 编译busybox</span>
@@ -99,6 +102,10 @@ make linux
 `./build.sh barematel`
 ## <span style="color:#9933ff;"> 2.15 打包所有Image</span>
 `./build.sh image`
+
+## <span style="color:#9933ff;"> 2.16 运行</span>
+`./run.sh`
+
 # <span style="color:#e60000;"><span style="font-size:20px;">**3 内存分布**</span></span>
 - 目前已经集成的`Memory`及其`基地址`如下（`不断更新`）：
 
