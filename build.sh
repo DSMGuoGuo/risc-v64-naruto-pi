@@ -9,6 +9,8 @@ else
 fi
 PROJECT_DIR=$(pwd)
 
+ROOTFS_SEL=$2
+
 COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output
 COMPILE_TOOLS_PATH=$COMPILE_PATH/bin
 COMPILE_LIB_PATH=$COMPILE_PATH/sysroot
@@ -272,6 +274,29 @@ build_make_image()
 	sudo $BUILD_ROOTFS_PATH/build.sh $OUTPUT_IMG_PATH/rootfs
 }
 
+build_all()
+{
+	build_qemu_defconfig
+	build_qemu
+	build_lowlevelinit
+	build_sbi_dtb
+	build_sbi
+	build_uboot_dtb
+	build_uboot_defconfig
+	build_uboot
+	build_kernel_defconfig
+	build_kernel
+	if [ "$ROOTFS_SEL" == "busybox" ]; then
+		build_busybox
+	elif [ "$ROOTFS_SEL" == "ubuntu" ]; then
+		build_ubuntu
+	fi
+
+	build_baremetal
+
+	build_make_image
+}
+
 case "$BUILD_TARGET" in
 --help)
 	echo_usage
@@ -322,10 +347,15 @@ baremetal)
 image)
 	build_make_image
 	;;
+all)
+	build_all
+	;;
+
 clean)
 	build_clean
 	;;
 *)
+	echo "Unknown target: $BUILD_TARGET"
 	exit 255
 	;;
 esac
