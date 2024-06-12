@@ -1,7 +1,9 @@
 #!/bin/bash
 
-PROJECT_DIR=/home/jihongz/workspace/05_JHPI/risc-v64-naruto-pi
-QEMU_PATH=/home/jihongz/workspace/02_qemu/output/bin
+PROJECT_DIR=$(pwd)
+
+QEMU_OUTPUT_PATH=$PROJECT_DIR/output/qemu
+QEMU_PATH=$QEMU_OUTPUT_PATH/bin
 OUTPUT_IMG_PATH=$PROJECT_DIR/output
 export PATH=$PATH:$QEMU_PATH
 

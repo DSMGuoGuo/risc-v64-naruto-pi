@@ -13,7 +13,7 @@
 #define CONS(NUM, TYPE)NUM##TYPE
 #endif /* __ASSEMBLER__ */
 
-#define NS16550_ADDR		CONS(0x10000000, U)
+#define NS16550_ADDR		CONS(0x10002000, U)
 
 static char printk_string[UART_LOG_BUFF_SIZE] = {0};
 

@@ -1,23 +1,25 @@
 #!/bin/bash
 
-folder="./output"
-
-if [ -d "$folder" ]; then
+if [ -d "./output" ]; then
 	echo "---------------------------- 进入自动脚本 ----------------------"
 else
 	echo "---------------------------- 进入自动脚本 ----------------------"
 	mkdir ./output
+	mkdir ./output/qemu
 fi
+PROJECT_DIR=$(pwd)
 
-QEMU_PATH=/home/jihongz/workspace/02_qemu/output/bin
-QEMU_OUTPUT_PATH=/home/jihongz/workspace/02_qemu/output
-COMPILE_TOOLS_PATH=/home/jihongz/workspace/03_toolchain/output/bin
+COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output
+COMPILE_TOOLS_PATH=$COMPILE_PATH/bin
+COMPILE_LIB_PATH=$COMPILE_PATH/sysroot
 COMPILE_TOOLS=riscv64-unknown-linux-gnu
-COMPILE_LIB_PATH=/home/jihongz/workspace/03_toolchain/output/sysroot
+
+QEMU_OUTPUT_PATH=$PROJECT_DIR/output/qemu
+QEMU_PATH=$QEMU_OUTPUT_PATH/bin
+
 export PATH=$PATH:$QEMU_PATH
 export PATH=$PATH:$COMPILE_TOOLS_PATH
 
-PROJECT_DIR=/home/jihongz/workspace/05_JHPI/risc-v64-naruto-pi
 OUTPUT_IMG_PATH=$PROJECT_DIR/output
 DTS_PATH=$PROJECT_DIR/dts
 SBI_SOURCE_PATH=$PROJECT_DIR/opensbi
@@ -29,10 +31,13 @@ BUILD_ROOTFS_PATH=$PROJECT_DIR/rootfs_build
 
 BAREMETAL_PATH=$PROJECT_DIR/baremetal
 LOWLEVEL_FW_PATH=$BAREMETAL_PATH/lowlevelinit
-TRUSTED_DOMAIN_PATH=$BAREMETAL_PATH/uart2_test
 UBUNTU20_ROOTFS_PATH=$ROOTFS_PATH/ubuntu20.04
 BUSYBOX_SOURCE_PATH=$ROOTFS_PATH/busybox
 BUSYBOX_CONFIG_PATH=$ROOTFS_PATH/busybox_config
+BAREMETAL_PROJECT=$BAREMETAL_PATH/bare-metal
+
+CPU_CORE7_IMG_OUT_PATH=bare-metal
+CPU_CORE7_IMG_NAME=main
 
 SBI_IMG_NAME=naruto_sbi
 SBI_DTS_NAME=naruto_sbi
@@ -72,17 +77,15 @@ build_lowlevelinit()
 		mkdir $OUTPUT_IMG_PATH/lowinit
 	fi
 
-# 编译汇编文件startup.S到obj文件
 	$COMPILE_TOOLS-gcc -x assembler-with-cpp -c startup.S -o ./startup.o
 
-# 使用链接脚本链接obj文件生成elf可执行文件  
 	$COMPILE_TOOLS-gcc -nostartfiles -T./boot.lds -Wl,-Map=$OUTPUT_IMG_PATH/lowinit/$LOWLEVEL_FW_NAME.map -Wl,--gc-sections ./startup.o -o $OUTPUT_IMG_PATH/lowinit/$LOWLEVEL_FW_NAME.elf
 
-# 使用gnu工具生成原始的程序bin文件  
 	$COMPILE_TOOLS-objcopy -O binary -S $OUTPUT_IMG_PATH/lowinit/$LOWLEVEL_FW_NAME.elf $OUTPUT_IMG_PATH/lowinit/$LOWLEVEL_FW_NAME.bin
 
-# 使用gnu工具生成反汇编文件，方便调试分析
 	$COMPILE_TOOLS_PATH/$COMPILE_TOOLS-objdump --source --demangle --disassemble --reloc --wide $OUTPUT_IMG_PATH/lowinit/$LOWLEVEL_FW_NAME.elf > $OUTPUT_IMG_PATH/lowinit/$LOWLEVEL_FW_NAME.lst
+
+	rm -rf ./startup.o
 }
 
 build_sbi()
@@ -151,13 +154,6 @@ build_uboot_dtb()
 	dtc -i $UBOOT_DTS_NAME.dts -I dts -O dtb -o $OUTPUT_IMG_PATH/dts/$UBOOT_DTS_NAME.dtb $OUTPUT_IMG_PATH/dts/$UBOOT_DTS_NAME.dtb.dts.tmp 
 }
 
-build_trusted()
-{
-	echo "---------------------------- 编译Trusted domain -----------------"
-	cd $TRUSTED_DOMAIN_PATH/
-	sh build.sh
-}
-
 build_kernel_defconfig()
 {
 	echo "---------------------------- 配置kernel config -----------------"
@@ -198,7 +194,7 @@ build_tar_ubuntu()
 
 build_busybox()
 {
-	if [ ! -d "$OUTPUT_IMG_PATH/busybox" ]; then  
+	if [ ! -d "$OUTPUT_IMG_PATH/busybox" ]; then
 		mkdir $OUTPUT_IMG_PATH/busybox
 	fi
 
@@ -211,6 +207,12 @@ build_busybox()
 	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- install
 }
 
+build_baremetal()
+{
+	cd $BAREMETAL_PROJECT/
+	sh build.sh $PROJECT_DIR $COMPILE_TOOLS_PATH/$COMPILE_TOOLS $BAREMETAL_PROJECT
+}
+
 build_make_image()
 {
 	echo "---------------------------- 制作image -------------------------"
@@ -221,8 +223,7 @@ build_make_image()
 	dd of=fw.bin bs=1k conv=notrunc seek=512 if=$OUTPUT_IMG_PATH/dts/$SBI_DTS_NAME.dtb
 	dd of=fw.bin bs=1k conv=notrunc seek=1K if=$OUTPUT_IMG_PATH/dts/$UBOOT_DTS_NAME.dtb
 	dd of=fw.bin bs=1k conv=notrunc seek=2K if=$OUTPUT_IMG_PATH/opensbi/fw_jump.bin
-	dd of=fw.bin bs=1k conv=notrunc seek=4K if=$TRUSTED_DOMAIN_PATH/uart2.bin
-	# dd of=fw.bin bs=1k conv=notrunc seek=8K if=$OUTPUT_IMG_PATH/uart0.bin
+	dd of=fw.bin bs=1k conv=notrunc seek=4K if=$CPU_CORE7_IMG_OUT_PATH/$CPU_CORE7_IMG_NAME.bin
 	dd of=fw.bin bs=1k conv=notrunc seek=8K if=$OUTPUT_IMG_PATH/uboot/u-boot.bin
 
 	sudo rm -rf $OUTPUT_IMG_PATH/rootfs
@@ -300,9 +301,6 @@ uboot)
 uboot_dtb)
 	build_uboot_dtb
 	;;
-trusted)
-	build_trusted
-	;;
 kernel_defconfig)
 	build_kernel_defconfig
 	;;
@@ -317,6 +315,9 @@ tar_ubuntu)
 	;;
 busybox)
 	build_busybox
+	;;
+baremetal)
+	build_baremetal
 	;;
 image)
 	build_make_image
