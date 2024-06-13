@@ -2,6 +2,23 @@
 
 `Naruto Pi`是基于`QEMU`构建的`RISC-V64 SOC`，支持`Linux`，`baremetal`, `RTOS`等，适合用来学习`Linux`，后续还会添加大量的`controller`，实现无需实体开发板，就学习`Linux`和`RISC-V`架构。
 
+- 登录用户名和密码：
+- Ubuntu：
+
+	username：jihongz
+    
+    password：1
+ - busybox（root）：
+ 
+ 	username：root
+    
+    password：root
+    
+ - busybox（naruto）：
+ 
+ 	username：naruto
+    
+    password：naruto
 
 # <span style="color:#e60000;"><span style="font-size:20px;">**2 编译Naruto Pi**</span></span>
 
