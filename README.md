@@ -2,7 +2,7 @@
 
 `Naruto Pi`是基于`QEMU`构建的`RISC-V64 SOC`，支持`Linux`，`baremetal`, `RTOS`等，适合用来学习`Linux`，后续还会添加大量的`controller`，实现无需实体开发板，就学习`Linux`和`RISC-V`架构。
 
-- 登录用户名和密码：
+ # 登录用户名和密码：
 - Ubuntu：
 
 	username：jihongz
@@ -19,6 +19,29 @@
  	username：naruto
     
     password：naruto
+    
+   
+ # 环境部署(基于Ubuntu20.04)
+在开始编译之前需要部署一下依赖，安装以下依赖
+```
+sudo apt-get install git libglib2.0-dev libfdt-dev libpixman-1-dev zlib1g-dev ninja-build
+# 建议安装的额外的包, qemu: 为了额外的功能
+sudo apt-get install git-email
+sudo apt-get install libaio-dev libbluetooth-dev libcapstone-dev libbrlapi-dev libbz2-dev
+sudo apt-get install libcap-ng-dev libcurl4-gnutls-dev libgtk-3-dev
+sudo apt-get install libibverbs-dev libjpeg8-dev libncurses5-dev libnuma-dev
+sudo apt-get install librbd-dev librdmacm-dev
+sudo apt-get install libsasl2-dev libsdl2-dev libseccomp-dev libsnappy-dev libssh-dev
+sudo apt-get install libvde-dev libvdeplug-dev libvte-2.91-dev libxen-dev liblzo2-dev
+sudo apt-get install valgrind xfslibs-dev
+sudo apt-get install python3.8-venv
+#ssh服务，需要的再装
+sudo apt install openssh-server
+#缺啥安装啥
+sudo apt-get install flex
+sudo apt-get install bison
+```
+
 
 # <span style="color:#e60000;"><span style="font-size:20px;">**2 编译Naruto Pi**</span></span>
 
