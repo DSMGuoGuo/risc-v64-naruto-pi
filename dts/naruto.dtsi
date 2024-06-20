@@ -256,6 +256,21 @@
 			status = "disabled";
 		};
 
+		syscon: syscon@100000 {
+			phandle = <0x14>;
+			reg = <0x0 0x100000 0x0 0x1000>;
+			compatible = "syscon";
+			status = "disabled";
+		};
+
+		reboot: reboot {
+			value = <0x7777>;
+			offset = <0x0>;
+			regmap = <&syscon>;
+			compatible = "syscon-reboot";
+			status = "disabled";
+		};
+
 		virtio_mmio0:virtio_mmio@10107000 {
 			interrupts = <8>;
 			interrupt-parent = <&plic>;

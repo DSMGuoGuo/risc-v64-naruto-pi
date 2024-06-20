@@ -61,6 +61,14 @@
 	status = "okay";
 };
 
+&syscon {
+	status = "okay";
+};
+
+&reboot {
+	status = "okay";
+};
+
 &pflash {
 	status = "okay";
 };

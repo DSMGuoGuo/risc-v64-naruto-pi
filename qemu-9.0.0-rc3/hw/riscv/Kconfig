@@ -89,6 +89,7 @@ config SPIKE
     select SIFIVE_PLIC
 
 config NARUTO
-    bool
-    select MSI_NONBROKEN
-    select UNIMP
+	bool
+	select MSI_NONBROKEN
+	select UNIMP
+	select NARUTO_SYSCON

@@ -31,10 +31,12 @@
 #include "hw/intc/sifive_plic.h"
 #include "hw/block/flash.h"
 #include "hw/char/serial.h"
+#include "hw/misc/naruto-misc.h"
 
 static const MemMapEntry naruto_soc_memmap[] = {
 	[NARUTO_SOC_ROM]			= {0x00000000,	0x8000},
 	[NARUTO_SOC_SRAM]			= {0x00008000,	0x8000},
+	[NARUTO_SOC_SYSCON]			= {0x00100000,	0x1000},
 	[NARUTO_SOC_CLINT]			= {0x02000000,	0x10000},
 	[NARUTO_SOC_PLIC]			= {0x0c000000,	0x4000000},
 	[NARUTO_SOC_UART0]			= {0x10000000,	0x1000},
@@ -297,6 +299,16 @@ static void naruto_rtc_realize(DeviceState *dev)
 }
 
 /**
+ * @brief Naruto Pi System configure realize.
+ * 
+ * @param dev 
+ */
+static void naruto_syscon_realize(DeviceState *dev)
+{
+	naruto_syscon_create(naruto_soc_memmap[NARUTO_SOC_SYSCON].base);
+}
+
+/**
  * @brief Create NARUTO_SOC_Device.
  * 
  * @param obj 
@@ -321,6 +333,7 @@ static void naruto_soc_realize(DeviceState *dev, Error **err)
 	naruto_virtio_realize(dev);
 	naruto_fw_cfg_realize(dev);
 	naruto_rtc_realize(dev);
+	naruto_syscon_realize(dev);
 }
 
 static void naruto_soc_class_init(ObjectClass *klass, void *data)
