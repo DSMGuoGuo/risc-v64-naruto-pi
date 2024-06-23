@@ -101,8 +101,6 @@ make j8
 ## <span style="color:#9933ff;"> 2.2 整体编译（ubuntu 文件系统）</span>
 `./build.sh all ubuntu`
 
-![image.png](https://raw.gitcode.com/DSMGUOGUO/risc-v64-naruto-pi/attachment/uploads/a2d70498-994a-4ccf-b9af-cbc6cc07c1ed/image.png 'image.png')
-
 - 如果只是编译部分，则可以使用下列命令去编译对应的`Image`.
 ## <span style="color:#9933ff;"> 2.3 编译qemu</span>
 `./build.sh qemu_defconfig`
