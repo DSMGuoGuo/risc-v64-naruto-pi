@@ -69,6 +69,10 @@
 	status = "okay";
 };
 
+&poweroff {
+	status = "okay";
+};
+
 &pflash {
 	status = "okay";
 };

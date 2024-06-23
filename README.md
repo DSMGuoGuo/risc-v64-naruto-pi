@@ -177,6 +177,7 @@ make linux
 static const MemMapEntry naruto_soc_memmap[] = {
 	[NARUTO_SOC_ROM]			= {0x00000000,	0x8000},
 	[NARUTO_SOC_SRAM]			= {0x00008000,	0x8000},
+	[NARUTO_SOC_SYSCON]			= {0x00100000,	0x1000},
 	[NARUTO_SOC_CLINT]			= {0x02000000,	0x10000},
 	[NARUTO_SOC_PLIC]			= {0x0c000000,	0x4000000},
 	[NARUTO_SOC_UART0]			= {0x10000000,	0x1000},
