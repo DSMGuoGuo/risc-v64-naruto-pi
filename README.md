@@ -80,10 +80,12 @@ git clone https://gitee.com/mirrors/riscv-gcc
 - 编译交叉编译工具链源码
 - 设置输出路径,这个输出路径就是我们上面要改的脚本的那个路径，记得一定要相同。
 - Linux和bare-metal是两个工具链，所以分开分配和分开编译，别配置两次在编译，不然会被覆盖，总之，先configure Linux一次，在make linux一次，然后再configure bare-metal，再make bare-metal。
+
 - Linux 工具链
 ```bash
 ./configure --prefix=/home/jihongz/workspace/03_toolchain/output/linux
 ```
+
 - bare-metal工具链
 ```
 ./configure --prefix=/home/jihongz/workspace/03_toolchain/output/bare-metal
