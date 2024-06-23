@@ -48,9 +48,10 @@ sudo apt-get install bison
 - 编译之前需要注意更改脚本GCC编译器地址
 - 文件路径：`build.sh`,将如下路径改成自己的编译器路径
 ```sh
-COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output
+COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output/linux
+COMPILE_NEWLIB_PATH=/home/jihongz/workspace/03_toolchain/output/bare-metal
 ```
-- 编译器需要`RISCV64`的编译器，需要支持`Linux`.
+- 编译器需要`RISCV64`的编译器，需要支持`Linux`，如果需要跑bare-metal则还需要newlib-c
 
 - 获取交叉编译工具链源码
 - 方法一： 官方`git`仓库，此方法比较慢，开了梯子也没用，用了公网`IP`也没用，建议用方法二
@@ -77,16 +78,24 @@ git clone https://gitee.com/mirrors/riscv-glibc
 git clone https://gitee.com/mirrors/riscv-gcc
 ```
 - 编译交叉编译工具链源码
-- 设置输出路径,这个输出路径就是我们上面要改的脚本的那个路径，记得一定要相同
+- 设置输出路径,这个输出路径就是我们上面要改的脚本的那个路径，记得一定要相同,Linux和bare-metal是两个工具链，所以分开分配和分开编译，别配置两次在编译，不然会被覆盖，总之，先configure Linux一次，在make linux一次，然后再configure bare-metal，再make bare-metal。
+- Linux 工具链
 ```bash
-./configure --prefix=/home/jihongz/workspace/03_toolchain/output
+./configure --prefix=/home/jihongz/workspace/03_toolchain/output/linux
+```
+- bare-metal工具链
+```
+./configure --prefix=/home/jihongz/workspace/03_toolchain/output/bare-metal
 ```
 - 编译（如果出现权限问题加`sudo`即可）
-
+- Linux
 ```bash
 make linux
 ```
-
+- bare-metal
+```bash
+make j8
+```
 ## <span style="color:#9933ff;"> 2.1 整体编译（busybox 文件系统）</span>
 `./build.sh all busybox`
 ## <span style="color:#9933ff;"> 2.2 整体编译（ubuntu 文件系统）</span>

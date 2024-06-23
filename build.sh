@@ -11,10 +11,13 @@ PROJECT_DIR=$(pwd)
 
 ROOTFS_SEL=${2:-busybox}
 
-COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output
+COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output/linux
+COMPILE_NEWLIB_PATH=/home/jihongz/workspace/03_toolchain/output/bare-metal
+COMPILE_NEWLIB_TOOLS_PATH=$COMPILE_NEWLIB_PATH/bin
 COMPILE_TOOLS_PATH=$COMPILE_PATH/bin
 COMPILE_LIB_PATH=$COMPILE_PATH/sysroot
 COMPILE_TOOLS=riscv64-unknown-linux-gnu
+COMPILE_NEWLIB_TOOLS=riscv64-unknown-elf
 
 QEMU_OUTPUT_PATH=$PROJECT_DIR/output/qemu
 QEMU_PATH=$QEMU_OUTPUT_PATH/bin
@@ -196,6 +199,7 @@ build_tar_ubuntu()
 
 build_busybox()
 {
+	echo "---------------------------- 编译busybox -------------------------"
 	if [ ! -d "$OUTPUT_IMG_PATH/busybox" ]; then
 		mkdir $OUTPUT_IMG_PATH/busybox
 	fi
@@ -211,8 +215,9 @@ build_busybox()
 
 build_baremetal()
 {
+	echo "---------------------------- 编译baremetal -------------------------"
 	cd $BAREMETAL_PROJECT/
-	sh build.sh $PROJECT_DIR $COMPILE_TOOLS_PATH/$COMPILE_TOOLS $BAREMETAL_PROJECT
+	sh build.sh $PROJECT_DIR $COMPILE_NEWLIB_TOOLS_PATH/$COMPILE_NEWLIB_TOOLS $BAREMETAL_PROJECT
 }
 
 build_make_image()
