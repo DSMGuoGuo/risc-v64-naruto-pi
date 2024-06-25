@@ -11,6 +11,8 @@ PROJECT_DIR=$(pwd)
 
 ROOTFS_SEL=${2:-busybox}
 
+NUMBER_OF_CPU=-j4
+
 COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output/linux
 COMPILE_NEWLIB_PATH=/home/jihongz/workspace/03_toolchain/output/bare-metal
 COMPILE_NEWLIB_TOOLS_PATH=$COMPILE_NEWLIB_PATH/bin
@@ -69,7 +71,7 @@ build_qemu()
 {
 	echo "---------------------------- 编译QEMU -------------------------"
 	cd $QEMU_SOURCE_PATH
-	make -j8
+	make $NUMBER_OF_CPU
 	sudo make install
 }
 
@@ -138,7 +140,7 @@ build_uboot()
 		mkdir $OUTPUT_IMG_PATH/uboot
 	fi
 
-	make CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- -j8 DEVICE_TREE=../../../../output/dts/$UBOOT_DTS_NAME
+	make CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- $NUMBER_OF_CPU DEVICE_TREE=../../../../output/dts/$UBOOT_DTS_NAME
 	cp $UBOOT_SOURCE_PATH/u-boot $OUTPUT_IMG_PATH/uboot/u-boot.elf
 	cp $UBOOT_SOURCE_PATH/u-boot.map $OUTPUT_IMG_PATH/uboot/u-boot.map
 	cp $UBOOT_SOURCE_PATH/u-boot.bin $OUTPUT_IMG_PATH/uboot/u-boot.bin
@@ -175,7 +177,7 @@ build_kernel()
 		mkdir $OUTPUT_IMG_PATH/linux_kernel
 	fi
 
-	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- -j8
+	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- $NUMBER_OF_CPU
 	cp $KERNEL_SOURCE_PATH/arch/riscv/boot/Image $OUTPUT_IMG_PATH/linux_kernel/Image
 }
 
@@ -209,7 +211,7 @@ build_busybox()
 	cd $BUSYBOX_SOURCE_PATH/
 	make clean
 	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- qemu-naruto_pi_defconfig
-	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- -j8
+	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- $NUMBER_OF_CPU
 	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- install
 }
 
