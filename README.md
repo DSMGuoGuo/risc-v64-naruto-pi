@@ -1,27 +1,27 @@
-# <span style="color:#e60000;"><span style="font-size:20px;">**1 描述Naruto Pi**</span></span>
+## <font  size=5 color=##00BFFF> 1. 概述</font>
 
-`Naruto Pi`是基于`QEMU`构建的`RISC-V64 SOC`，支持`Linux`，`baremetal`, `RTOS`等，适合用来学习`Linux`，后续还会添加大量的`controller`，实现无需实体开发板，就学习`Linux`和`RISC-V`架构。
+`Naruto Pi`是基于`QEMU`构建的`RISC-V64 SOC`，支持`Linux`，`baremetal`, `RTOS`等，适合用来学习`Linux`，后续还会添加大量的`controller`，实现无需实体开发板即可学习`Linux`和`RISC-V`架构，是用来探索嵌入式的奥秘的绝佳之选，本项目长期更新，后续会支持`SPI`，`I2C`，`USB`，`Ethernet`，`Boot Flow`，`I2S`，`ADC`，`RTC`，`Power`等经典常用`IP`和`Driver`，同时也设有文档手把手跟学，非常适合想从零了解`CPU`实现和`bringup`的小伙伴。
 
  # 登录用户名和密码：
-- Ubuntu：
+- `Ubuntu`：
 
 	username：jihongz
     
     password：1
- - busybox（root）：
+ - `busybox`（root）：
  
  	username：root
     
     password：root
     
- - busybox（naruto）：
+ - `busybox`（naruto）：
  
  	username：naruto
     
     password：naruto
     
    
- # 环境部署(基于Ubuntu20.04)
+ ## <font  size=5 color=##00BFFF> 2. 环境部署基于`Ubuntu20.04`</font>
 在开始编译之前需要部署一下依赖，安装以下依赖
 ```
 sudo apt-get install git libglib2.0-dev libfdt-dev libpixman-1-dev zlib1g-dev ninja-build
@@ -35,6 +35,10 @@ sudo apt-get install libsasl2-dev libsdl2-dev libseccomp-dev libsnappy-dev libss
 sudo apt-get install libvde-dev libvdeplug-dev libvte-2.91-dev libxen-dev liblzo2-dev
 sudo apt-get install valgrind xfslibs-dev
 sudo apt-get install python3.8-venv
+sudo apt-get install texinfo
+sudo apt-get install gawk
+sudo apt-get install autoconf automake autotools-dev curl python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev
+
 #ssh服务，需要的再装
 sudo apt install openssh-server
 #缺啥安装啥
@@ -42,119 +46,125 @@ sudo apt-get install flex
 sudo apt-get install bison
 ```
 
+ ## <font  size=5 color=##00BFFF> 3. 整体编译Naruto Pi</font>
+ 
+在开始编译之前需要部署一下依赖，安装以下依赖
 
-# <span style="color:#e60000;"><span style="font-size:20px;">**2 编译Naruto Pi**</span></span>
 
-- 编译之前需要注意更改脚本GCC编译器地址
-- 文件路径：`build.sh`,将如下路径改成自己的编译器路径
-```sh
-COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output/linux
-COMPILE_NEWLIB_PATH=/home/jihongz/workspace/03_toolchain/output/bare-metal
-```
-- 编译器需要`RISCV64`的编译器，需要支持`Linux`，如果需要跑bare-metal则还需要newlib-c
+- 编译器需要`RISCV64`的编译器，需要支持`Linux`，如果需要跑`bare-metal`则还需要`newlib-c`
 
-- 获取交叉编译工具链源码
-- 方法一： 官方`git`仓库，此方法比较慢，开了梯子也没用，用了公网`IP`也没用，建议用方法二
+- 编译交叉编译工具链，这一步会很慢，我估计普通电脑需要三个小时，所以可以先去玩一会再回来
 
 ```bash
-git clone https://github.com/riscv/riscv-gnu-toolchain --recursive
+./build.sh compile
 ```
-- 方法二：`Gitee`下载`main`仓库
+ ## <font  size=4 color=##00BFFF> 3.1 整体编译（如果使用ubuntu 文件系统）</font>
+
 
 ```bash
-git clone  https://gitee.com/mirrors/riscv-gnu-toolchain
+./build.sh all busybox
 ```
-- branch 分支，全拉下来
+ ## <font  size=4 color=##00BFFF> 3.1 整体编译（如果使用busybox 文件系统）</font>
 
 ```bash
-cd riscv-gnu-toolchain
+./build.sh all ubuntu
+```
+ ## <font  size=5 color=##00BFFF> 4. 模块化编译Naruto Pi</font>
+ 
+- 如果后期开发只是更改部分部分内容，则可以使用下列命令去编译对应的代码即可，这样速度比较快.
+
+ ## <font  size=4 color=##00BFFF> 4.1 编译qemu</font>
+ `QEMU`是虚拟机软件，将`RISCV`指令集翻译成`x86`指令集运行的环境。
+```bash
+./build.sh qemu_defconfig
 ```
 
 ```bash
-git clone https://gitee.com/mirrors/riscv-newlib
-git clone https://gitee.com/mirrors/riscv-binutils-gdb
-git clone https://gitee.com/mirrors/riscv-dejagnu
-git clone https://gitee.com/mirrors/riscv-glibc
-git clone https://gitee.com/mirrors/riscv-gcc
-```
-- 编译交叉编译工具链源码
-- 设置输出路径,这个输出路径就是我们上面要改的脚本的那个路径，记得一定要相同。
-- Linux和bare-metal是两个工具链，所以分开分配和分开编译，别配置两次在编译，不然会被覆盖，总之，先configure Linux一次，在make linux一次，然后再configure bare-metal，再make bare-metal。
-
-- Linux 工具链
-```bash
-./configure --prefix=/home/jihongz/workspace/03_toolchain/output/linux
+./build.sh qemu
 ```
 
-- bare-metal工具链
-```
-./configure --prefix=/home/jihongz/workspace/03_toolchain/output/bare-metal
-```
-- 编译（如果出现权限问题加`sudo`即可）
-- Linux
-```bash
-make linux
-```
-- bare-metal
-```bash
-make j8
-```
-## <span style="color:#9933ff;"> 2.1 整体编译（busybox 文件系统）</span>
-`./build.sh all busybox`
-## <span style="color:#9933ff;"> 2.2 整体编译（ubuntu 文件系统）</span>
-`./build.sh all ubuntu`
-
-- 如果只是编译部分，则可以使用下列命令去编译对应的`Image`.
-## <span style="color:#9933ff;"> 2.3 编译qemu</span>
-`./build.sh qemu_defconfig`
-
-`./build.sh qemu`
-## <span style="color:#9933ff;"> 2.4 编译lowinit</span>
+ ## <font  size=4 color=##00BFFF> 4.2 编译lowinit</font>
 `lowinit` 是`bootrom`跳转出来的第一个程序，主要负责把`BL1~BL3`的程序从模拟的`pFLASH`中拷贝到`DDR`中。
 
-`./build.sh lowinit`
+```bash
+./build.sh lowinit
+```
+ ## <font  size=4 color=##00BFFF> 4.3 编译opensbi 设备树</font>
 
-## <span style="color:#9933ff;"> 2.5 编译lowinit</span>
-`./build.sh lowinit`
+```bash
+./build.sh sbi_dtb
+```
+ ## <font  size=4 color=##00BFFF> 4.4 编译Opensbi</font>
 
-## <span style="color:#9933ff;"> 2.6 编译oensbi 设备树</span>
-`./build.sh sbi_dtb`
+```bash
+./build.sh sbi
+```
 
-## <span style="color:#9933ff;"> 2.7 编译oensbi</span>
-`./build.sh sbi`
-## <span style="color:#9933ff;"> 2.8 编译uboot 和kernel 设备树</span>
+ ## <font  size=4 color=##00BFFF> 4.5 编译uboot 和kernel 设备树</font>
+ 
 - `Naruto Pi`的`Kernel`和`U-boot`使用的是同一个设备树，统一管理。
 
-`./build.sh sbi`
+```bash
+./build.sh uboot_dtb
+```
+ ## <font  size=4 color=##00BFFF> 4.6 编译uboot</font>
 
-## <span style="color:#9933ff;"> 2.9 编译uboot</span>
-`./build.sh uboot_defconfig`
+```bash
+./build.sh uboot_defconfig
+```
 
-`./build.sh uboot`
+```bash
+./build.sh uboot
+```
+ ## <font  size=4 color=##00BFFF> 4.7 编译kernel</font>
 
-## <span style="color:#9933ff;"> 2.10 编译kernel</span>
-`./build.sh kernel_defconfig`
+```bash
+./build.sh kernel_defconfig
+```
 
-`./build.sh kernel`
+```bash
+./build.sh kernel
+```
+ ## <font  size=4 color=##00BFFF> 4.8 编译ubuntu文件系统（如使用busybox可以不编译）</font>
 
-## <span style="color:#9933ff;"> 2.11 编译ubuntu</span>
-`./build.sh ubuntu`
+```bash
+./build.sh ubuntu
+```
+ ## <font  size=4 color=##00BFFF> 4.9 压缩ubuntu</font>
 
-## <span style="color:#9933ff;"> 2.12 压缩ubuntu</span>
-- 如果改过Ubuntu文件系统，想再次打包可以直接调用脚本：
+- 如果改过`Ubuntu`文件系统，想再次打包可以直接调用脚本，这个主要是我用来把`Ubuntu`的文件系统拆分，这样才能使每个文件小于`10Mb`上传于`GIT`
 
-`./build.sh tar_ubuntu`
+```bash
+./build.sh tar_ubuntu
+```
+ ## <font  size=4 color=##00BFFF> 4.10 编译Busybox(同样和Ubuntu二选一即可)</font>
 
-## <span style="color:#9933ff;"> 2.13 编译busybox</span>
-`./build.sh busybox`
+```bash
+./build.sh busybox
+```
+ ## <font  size=4 color=##00BFFF> 4.11 编译bare-metal</font>
+- 我想讲解一些裸机的驱动，所以我想弄个裸机的目录，你们也可以用来跑裸机，裸机是`core 7`在运行。
+```bash
+./build.sh barematel
+```
+ ## <font  size=4 color=##00BFFF> 4.12 编译FreeRTOS</font>
+ - 用于运行`FreeRTOS`，同样是跑在`core 7`上，所以和`bare-metal` 二选一
 
-## <span style="color:#9933ff;"> 2.14 编译bare-metal</span>
-`./build.sh barematel`
-## <span style="color:#9933ff;"> 2.15 打包所有Image</span>
-`./build.sh image`
+```bash
+./build.sh freertos
+```
+ ## <font  size=5 color=##00BFFF>  打包所以Image 并运行Naruto Pi</font>
+- 打包
 
-## <span style="color:#9933ff;"> 2.16 运行</span>
-`./run.sh`
+```bash
+./build.sh image
+```
+
+- 运行
+
+```bash
+./run.sh
+```
 
 # <span style="color:#e60000;"><span style="font-size:20px;">**3 内存分布**</span></span>
 - 目前已经集成的`Memory`及其`基地址`如下（`不断更新`）：
@@ -181,7 +191,7 @@ make j8
 | 0x20C0_0000 | 20Mb| `reserved`|
 
 # <span style="color:#e60000;"><span style="font-size:20px;">**5 设备地址映射**</span></span>
-- 目前已经集成的`设备`及其`基地址`如下（`不断更新`）：
+- 目前已经集成的`设备名称`，`基地址`和`寄存器总大小`如下（`不断更新`）：
 
 ```c
 static const MemMapEntry naruto_soc_memmap[] = {

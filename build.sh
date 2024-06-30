@@ -13,8 +13,9 @@ ROOTFS_SEL=${2:-busybox}
 
 NUMBER_OF_CPU=-j4
 
-COMPILE_PATH=/home/jihongz/workspace/03_toolchain/output/linux
-COMPILE_NEWLIB_PATH=/home/jihongz/workspace/03_toolchain/output/bare-metal
+COMPILE_SOURCE_CODE_PATH=$PROJECT_DIR/compile_tools
+COMPILE_PATH=$COMPILE_SOURCE_CODE_PATH/output/linux
+COMPILE_NEWLIB_PATH=$COMPILE_SOURCE_CODE_PATH/output/bare-metal
 COMPILE_NEWLIB_TOOLS_PATH=$COMPILE_NEWLIB_PATH/bin
 COMPILE_TOOLS_PATH=$COMPILE_PATH/bin
 COMPILE_LIB_PATH=$COMPILE_PATH/sysroot
@@ -281,6 +282,40 @@ build_make_image()
 	sudo $BUILD_ROOTFS_PATH/build.sh $OUTPUT_IMG_PATH/rootfs
 }
 
+build_compile_tools()
+{
+	echo "---------------------------- 编译编译工具链 -------------------------"
+	if [ ! -d "$COMPILE_SOURCE_CODE_PATH" ]; then
+		mkdir $COMPILE_SOURCE_CODE_PATH
+	fi
+
+	if [ ! -d "$COMPILE_SOURCE_CODE_PATH/output" ]; then
+                mkdir $COMPILE_SOURCE_CODE_PATH/output
+        fi
+
+	if [ ! -d "$COMPILE_SOURCE_CODE_PATH/output/linux" ]; then
+                mkdir $COMPILE_SOURCE_CODE_PATH/output/linux
+        fi
+
+	if [ ! -d "$COMPILE_SOURCE_CODE_PATH/output/bare-metal" ]; then
+                mkdir $COMPILE_SOURCE_CODE_PATH/output/bare-metal
+        fi
+
+	cd $COMPILE_SOURCE_CODE_PATH
+
+	git clone  https://gitee.com/mirrors/riscv-gnu-toolchain
+	cd riscv-gnu-toolchain
+	git clone https://gitee.com/mirrors/riscv-newlib
+	git clone https://gitee.com/mirrors/riscv-binutils-gdb
+	git clone https://gitee.com/mirrors/riscv-dejagnu
+	git clone https://gitee.com/mirrors/riscv-glibc
+	git clone https://gitee.com/mirrors/riscv-gcc
+	./configure --prefix=$COMPILE_SOURCE_CODE_PATH/output/linux
+	make linux $NUMBER_OF_CPU
+	./configure --prefix=$COMPILE_SOURCE_CODE_PATH/output/bare-metal --with-cmodel=medany
+	make $NUMBER_OF_CPU
+}
+
 build_all()
 {
 	build_qemu_defconfig
@@ -353,6 +388,9 @@ baremetal)
 	;;
 image)
 	build_make_image
+	;;
+compile)
+	build_compile_tools
 	;;
 all)
 	build_all
