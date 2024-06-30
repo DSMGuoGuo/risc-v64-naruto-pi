@@ -1,0 +1,1 @@
+cmd_libpwdgrp/lib.a := rm -f libpwdgrp/lib.a; /home/jihong/Templates/risc-v64-naruto-pi/compile_tools/output/linux/bin/riscv64-unknown-linux-gnu-ar  rcs libpwdgrp/lib.a libpwdgrp/pwd_grp.o libpwdgrp/uidgid_get.o

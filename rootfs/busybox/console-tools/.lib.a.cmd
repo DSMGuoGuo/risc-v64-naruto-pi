@@ -1,0 +1,1 @@
+cmd_console-tools/lib.a := rm -f console-tools/lib.a; /home/jihong/Templates/risc-v64-naruto-pi/compile_tools/output/linux/bin/riscv64-unknown-linux-gnu-ar  rcs console-tools/lib.a console-tools/clear.o console-tools/reset.o console-tools/resize.o
