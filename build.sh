@@ -11,6 +11,8 @@ PROJECT_DIR=$(pwd)
 
 ROOTFS_SEL=${2:-busybox}
 
+TRUSTED_DOMAIN_SEL=${3:-freertos}
+
 NUMBER_OF_CPU=-j4
 
 COMPILE_SOURCE_CODE_PATH=$PROJECT_DIR/compile_tools
@@ -38,14 +40,17 @@ ROOTFS_PATH=$PROJECT_DIR/rootfs
 BUILD_ROOTFS_PATH=$PROJECT_DIR/rootfs_build
 
 BAREMETAL_PATH=$PROJECT_DIR/baremetal
-LOWLEVEL_FW_PATH=$BAREMETAL_PATH/lowlevelinit
+BOOT_PATH=$PROJECT_DIR/boot
+LOWLEVEL_FW_PATH=$BOOT_PATH/lowlevelinit
 UBUNTU20_ROOTFS_PATH=$ROOTFS_PATH/ubuntu20.04
 BUSYBOX_SOURCE_PATH=$ROOTFS_PATH/busybox
 BUSYBOX_CONFIG_PATH=$ROOTFS_PATH/busybox_config
 BAREMETAL_PROJECT=$BAREMETAL_PATH/bare-metal
 
-CPU_CORE7_IMG_OUT_PATH=bare-metal
-CPU_CORE7_IMG_NAME=main
+BARE_METAL_PATH=bare-metal
+BARE_METAL_IMG_NAME=main
+
+FREERTOS_PATH=$PROJECT_DIR/freertos
 
 SBI_IMG_NAME=naruto_sbi
 SBI_DTS_NAME=naruto_sbi
@@ -225,7 +230,28 @@ build_baremetal()
 {
 	echo "---------------------------- 编译baremetal -------------------------"
 	cd $BAREMETAL_PROJECT/
-	sh build.sh $PROJECT_DIR $COMPILE_NEWLIB_TOOLS_PATH/$COMPILE_NEWLIB_TOOLS $BAREMETAL_PROJECT
+	make CROSS_COMPILE=$COMPILE_NEWLIB_TOOLS_PATH/$COMPILE_NEWLIB_TOOLS- clean
+	make CROSS_COMPILE=$COMPILE_NEWLIB_TOOLS_PATH/$COMPILE_NEWLIB_TOOLS- $NUMBER_OF_CPU
+
+	if [ ! -d "$OUTPUT_IMG_PATH/trusted_domain" ]; then
+		mkdir $OUTPUT_IMG_PATH/trusted_domain
+	fi
+
+	cp ./build/trusted_fw.* $OUTPUT_IMG_PATH/trusted_domain/
+}
+
+build_freertos()
+{
+	echo "---------------------------- 编译FreeRTOS -------------------------"
+	cd $FREERTOS_PATH
+	make CROSS_COMPILE=$COMPILE_NEWLIB_TOOLS_PATH/$COMPILE_NEWLIB_TOOLS- clean
+	make CROSS_COMPILE=$COMPILE_NEWLIB_TOOLS_PATH/$COMPILE_NEWLIB_TOOLS- $NUMBER_OF_CPU
+
+	if [ ! -d "$OUTPUT_IMG_PATH/trusted_domain" ]; then
+		mkdir $OUTPUT_IMG_PATH/trusted_domain
+	fi
+
+	cp ./build/trusted_fw.* $OUTPUT_IMG_PATH/trusted_domain/
 }
 
 build_make_image()
@@ -238,7 +264,7 @@ build_make_image()
 	dd of=fw.bin bs=1k conv=notrunc seek=512 if=$OUTPUT_IMG_PATH/dts/$SBI_DTS_NAME.dtb
 	dd of=fw.bin bs=1k conv=notrunc seek=1K if=$OUTPUT_IMG_PATH/dts/$UBOOT_DTS_NAME.dtb
 	dd of=fw.bin bs=1k conv=notrunc seek=2K if=$OUTPUT_IMG_PATH/opensbi/fw_jump.bin
-	dd of=fw.bin bs=1k conv=notrunc seek=4K if=$CPU_CORE7_IMG_OUT_PATH/$CPU_CORE7_IMG_NAME.bin
+	dd of=fw.bin bs=1k conv=notrunc seek=4K if=$OUTPUT_IMG_PATH/trusted_domain/trusted_fw.bin
 	dd of=fw.bin bs=1k conv=notrunc seek=8K if=$OUTPUT_IMG_PATH/uboot/u-boot.bin
 
 	sudo rm -rf $OUTPUT_IMG_PATH/rootfs
@@ -339,7 +365,11 @@ build_all()
 		build_ubuntu
 	fi
 
-	build_baremetal
+	if [ "$TRUSTED_DOMAIN_SEL" == "baremetal" ]; then
+		build_baremetal
+	elif [ "$TRUSTED_DOMAIN_SEL" == "freertos" ]; then
+		build_freertos
+	fi
 
 	build_make_image
 }
@@ -390,6 +420,9 @@ busybox)
 	;;
 baremetal)
 	build_baremetal
+	;;
+freertos)
+	build_freertos
 	;;
 image)
 	build_make_image

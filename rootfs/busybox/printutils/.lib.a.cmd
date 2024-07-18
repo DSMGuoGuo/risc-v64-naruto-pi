@@ -1,1 +1,0 @@
-cmd_printutils/lib.a := rm -f printutils/lib.a; /home/jihong/Templates/risc-v64-naruto-pi/compile_tools/output/linux/bin/riscv64-unknown-linux-gnu-ar  rcs printutils/lib.a printutils/lpd.o printutils/lpr.o

@@ -60,15 +60,24 @@ sudo apt-get install bison
 ./build.sh compile
 ```
  ## <font  size=4 color=##00BFFF> 3.1 整体编译（如果使用ubuntu 文件系统）</font>
-
+- 如果使用FreeRTOS作为trusted domain 就加freertos，如果用baremetal则加baremetal
 
 ```bash
-./build.sh all busybox
+./build.sh all busybox freertos
 ```
+
+```bash
+./build.sh all busybox baremetal
+```
+
  ## <font  size=4 color=##00BFFF> 3.1 整体编译（如果使用busybox 文件系统）</font>
 
 ```bash
-./build.sh all ubuntu
+./build.sh all ubuntu freertos
+```
+
+```bash
+./build.sh all ubuntu baremetal
 ```
  ## <font  size=5 color=##00BFFF> 4. 模块化编译Naruto Pi</font>
  

@@ -1,1 +1,0 @@
-cmd_debianutils/lib.a := rm -f debianutils/lib.a; /home/jihong/Templates/risc-v64-naruto-pi/compile_tools/output/linux/bin/riscv64-unknown-linux-gnu-ar  rcs debianutils/lib.a debianutils/pipe_progress.o debianutils/run_parts.o debianutils/start_stop_daemon.o debianutils/which.o

@@ -1,1 +1,0 @@
-cmd_sysklogd/lib.a := rm -f sysklogd/lib.a; /home/jihong/Templates/risc-v64-naruto-pi/compile_tools/output/linux/bin/riscv64-unknown-linux-gnu-ar  rcs sysklogd/lib.a sysklogd/logread.o sysklogd/syslogd_and_logger.o
