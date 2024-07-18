@@ -57,8 +57,15 @@ BUILD_TARGET=$1
 build_clean()
 {
 	echo "---------------------------- 删除编译文件 ----------------------"
-	sudo rm -rf $OUTPUT_IMG_PATH/*
-	sudo rm -rf $UBUNTU20_ROOTFS_PATH/rootfs
+	cd $QEMU_SOURCE_PATH
+	make clean
+	cd $SBI_SOURCE_PATH
+	make clean
+	cd $UBOOT_SOURCE_PATH
+	make clean
+	cd $KERNEL_SOURCE_PATH
+	make clean
+	rm -rf $OUTPUT_IMG_PATH/*
 }
 
 build_qemu_defconfig()
@@ -127,8 +134,7 @@ build_sbi_dtb()
 build_uboot_defconfig()
 {
 	echo "---------------------------- 配置U-boot ------------------------"
-	cd $UBOOT_SOURCE_PATH/
-	make CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- clean
+	cd $UBOOT_SOURCE_PATH
 	make CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- qemu-naruto_pi_defconfig
 }
 
@@ -210,7 +216,6 @@ build_busybox()
 	sudo rm -rf $OUTPUT_IMG_PATH/busybox
 
 	cd $BUSYBOX_SOURCE_PATH/
-	make clean
 	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- qemu-naruto_pi_defconfig
 	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- $NUMBER_OF_CPU
 	make ARCH=riscv CROSS_COMPILE=$COMPILE_TOOLS_PATH/$COMPILE_TOOLS- install
@@ -322,8 +327,8 @@ build_all()
 	build_qemu
 	build_lowlevelinit
 	build_sbi_dtb
-	build_sbi
 	build_uboot_dtb
+	build_sbi
 	build_uboot_defconfig
 	build_uboot
 	build_kernel_defconfig

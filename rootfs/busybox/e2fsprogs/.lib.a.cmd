@@ -1,0 +1,1 @@
+cmd_e2fsprogs/lib.a := rm -f e2fsprogs/lib.a; /home/jihong/Templates/risc-v64-naruto-pi/compile_tools/output/linux/bin/riscv64-unknown-linux-gnu-ar  rcs e2fsprogs/lib.a e2fsprogs/chattr.o e2fsprogs/e2fs_lib.o
